@@ -40,7 +40,7 @@ def main():
 #Bucle principal de la mqaquina de estados
         while True:
             match estado_usuario["etapa"]:
-                case "iniciado":
+                case "inicio":
                     #PEDIMOS EL DNI Y HACEMOS DOBLE VALIDACION
 
                     entrada = input ("Por favor, inegrese su DNI (sin puntos ni espacios):  ").strip()
@@ -59,7 +59,7 @@ def main():
                             estado_usuario["nombre_empleado"] = empleado.get ("nombre", "Empleado")
                             print(f"\n¡Hola, {estado_usuario['nombre_empleado']}! Autenticación existosa.")
 
-                            estado_usuario ["estapa"] = "menu_tramite"
+                            estado_usuario ["etapa"] = "menu_tramite"
 
                         else:#Si el formato es correcto pero no esta en el CSV
                             print("El DNI ingresado no se encuentra registrado en el sistema."
@@ -109,21 +109,20 @@ def main():
                             "\n4. Salir.\n"
                         )
                         print("==============================================\n")
-                        menu = int(input("Su eleccion: ")).strip()
+                        menu_principal = int(input("Su eleccion: ").strip())
                         print()
-                        if menu not in range(1, 5):
+                        if menu_principal not in range(1, 5):
                             print(
                                 "No has ingresado un numero valido. Ingresa una opcion entre 1 y 4\n"
                             )
-                        else:
-                            break
+                            
                     except ValueError:
                         print(
                             "No has ingresado una opcion valida. Ingresa solamente un numero entre 1 y 4.\n"
                         )
 
                     # estructura match- case del menu principal
-                    match menu:
+                    match menu_principal:
                         case 1:
                             ...
 
