@@ -1,1 +1,1 @@
-id_solicitud,DNI_solicitante,tipo_de_licencia,estado_solicitud
+id_solicitud,DNI_solicitante,tipo_de_licencia,fecha_inicio,fecha_finalizacion,estado_solicitud
