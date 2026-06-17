@@ -47,8 +47,20 @@ def buscar_solicitud(dni):  # Devuelve la solicitud mas reciente de un empleado 
 
 
 def guardar_solicitud(dni, tipo_licencia, fecha_inicio, fecha_fin, descripcion):
-    pass  # Agrega una nueva solicitud con estado 'pendiente'.
-
+    with open("solicitudes_dias.csv", "a", newline="", encoding="utf-8") as archivo: #"a" para modo append, agrega al final del archivo sin borrar lo que hay
+        writer = csv.DictReader(archivo, fieldnames=[
+            "id_solicitud", "DNI_solicitante", "tipo_de_licencia", "fecha_inicio",
+            "fecha_finalizacion", "descripcion_solicitud", "estado_solicitud"
+        ])
+        writer.writerow({
+            "id_solicitud":             generar_id(),
+            "DNI_solicitante":          dni,
+            "tipo_de_licencia":         tipo_licencia,
+            "fecha_inicio":             fecha_inicio,
+            "fecha_finaliazcion":       fecha_fin,
+            "descripcion_solicitud":    descripcion,
+            "estado_solicitud":         "pendiente",
+        })
 
 def actualizar_campo_solicitud(dni, campo, nuevo_valor):
     pass  # Modifica un campo de la solicitud más reciente de un empleado. tipo_de_licencia, fecha_inicio, fecha_finalizacion,descripcion_solicitud, estado_solicitud
