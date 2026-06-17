@@ -98,16 +98,18 @@ def guardar_solicitud(dni, tipo_licencia, fecha_inicio, fecha_fin, descripcion):
 #    pass  # Modifica un campo de la solicitud más reciente de un empleado. tipo_de_licencia, fecha_inicio, fecha_finalizacion,descripcion_solicitud, estado_solicitud
 
 
-def buscar_saldo_dias(empleado):  # Devuelve el dict del empleado o None si no existe"
+def consultar_saldo_dias(dni):  # Devuelve el dict del empleado o None si no existe"
     try:
         with open(ARCHIVOS_EMPLEADOS, mode="r", encoding="utf-8") as archivo:
             # Usamos DictReader para leer las filas como diccionarios usando el encabezado
             lector = csv.DictReader(archivo)
 
             for fila in lector:
-                # Suponiendo que la columna en tu CSV se llama 'dni' o 'DNI'
-                if int(fila["dias_disponibles"]) == dias:
-                    return fila  # Retorna el diccionario con los datos del empleado
+                # consultamos los dias que tenga ese empleado
+                if int(fila["dni_empleado"]) == dni:
+                    return fila[
+                        "dias_disponibles"
+                    ]  # Retorna el diccionario con los datos del empleado
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo {ARCHIVOS_EMPLEADOS}.")
     except ValueError:

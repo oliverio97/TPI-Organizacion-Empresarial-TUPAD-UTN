@@ -1,8 +1,8 @@
-from maquina_estados import estado_usuario
+from archivos import consultar_saldo_dias
 
 
 # Flujo 1: Generar solicitud
-def generar_solicitud():
+def generar_solicitud(dni):
     """Maneja la generacion de licencias"""
     try:
         print("\n=============== TIPO DE SOLICITUD ===============")
@@ -16,8 +16,12 @@ def generar_solicitud():
 
         match opcion:
             case 1:
-                consultar_saldo_Dias(dias)
                 print("Iniciando generación de solicitud...")
+                dias_disponibles = consultar_saldo_dias(dni)
+                if int(dias_disponibles) > 0:
+                    print(f"Tenes {dias_disponibles} dias disponibles.")
+                else:
+                    return None
 
             case 2:
                 print("Opción en desarrollo...")

@@ -1,5 +1,6 @@
 from archivos import buscar_empleado
 from validaciones import validar_dni
+from solicitudes import generar_solicitud
 
 # MAQUINA DE ESTADOS: Diccionario con la "memoria" de la sesión
 estado_usuario = {
@@ -86,7 +87,9 @@ def manejar_menu_principal():
         match opcion:
             case 1:
                 print("Iniciando generación de solicitud...")
-                # estado_usuario["etapa"] = "pidiendo_fechas"
+                nuevo_estado = generar_solicitud(estado_usuario["dni"])
+                estado_usuario["etapa"] = nuevo_estado  ## CHEQUEAR ESTO
+                # estado_usuario["etapa"] = "pidiendo_fechas" # ESTA ES OTRA OPCION
             case 2:
                 print("Opción en desarrollo...")
             case 3:
