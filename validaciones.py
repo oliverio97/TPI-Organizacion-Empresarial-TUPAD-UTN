@@ -10,8 +10,14 @@ def validar_dni(dni_texto):
 def validar_fecha():
     pass
 
-def validar_dias():
-    pass
+def validar_dias(entrada): #Devuelve los dias como enteros si son validos, o none si el usuario ingreso letras, cero o un numero negativo. 
+    entrada = entrada.strip()
+    if not entrada.isdigit():
+        return None
+    dias = int(entrada)
+    if dias <= 0:
+        return None
+    return dias
 
 def tipo_descripcion():
     pass
