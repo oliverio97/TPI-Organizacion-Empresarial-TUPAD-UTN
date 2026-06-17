@@ -39,7 +39,10 @@ def validar_dias(entrada): #Devuelve los dias como enteros si son validos, o non
         return None
     return dias
 
-def tipo_descripcion():
-    pass
+def tipo_descripcion(entrada): #si el usuario ingresa menos de 10 caracteres devuelve None, si no devuelve el texto limpio.
+    entrada = entrada.strip()
+    if len(entrada) < 10:
+        return None
+    return entrada 
 
 
