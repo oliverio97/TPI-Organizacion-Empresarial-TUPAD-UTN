@@ -46,3 +46,5 @@ def tipo_descripcion(entrada): #si el usuario ingresa menos de 10 caracteres dev
     return entrada 
 
 
+def es_salida(entrada):
+    return entrada.strip().lower() in ["salida", "cancelar", "exit"]
