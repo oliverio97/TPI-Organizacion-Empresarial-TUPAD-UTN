@@ -34,7 +34,12 @@ def actualizar_dias_empleado(
 
 
 def generar_id():  # Genera un ID para nuevas solicitudes
-    pass
+    with open("solicitudes_dias,csv", "r", encoding="utf-8") as archivo:
+        filas = list(csv.DictReader (archivo))
+        if not filas:
+            return 1
+    ultimo_id = max(int(fila["id_solicitud"]) for fila in filas)
+    return ultimo_id + 1
 
 
 def buscar_solicitud(dni):  # Devuelve la solicitud mas reciente de un empleado o None
