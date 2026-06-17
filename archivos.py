@@ -38,7 +38,12 @@ def generar_id():  # Genera un ID para nuevas solicitudes
 
 
 def buscar_solicitud(dni):  # Devuelve la solicitud mas reciente de un empleado o None
-    pass
+    encontrada = None
+    with open ("solicitudes_dias.csv", "r", encoding="utf-8") as archivo: #El "utf-8" es para que soporte tildes, ñ y caracteres especiales. 
+        for fila in csv.DictReader(archivo):
+            if int(fila["DNI_solicitante"]) == dni:
+                encontrada = fila
+    return encontrada
 
 
 def guardar_solicitud(dni, tipo_licencia, fecha_inicio, fecha_fin, descripcion):
