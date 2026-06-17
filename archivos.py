@@ -5,8 +5,8 @@ ARCHIVOS_EMPLEADOS = "data/datos_empleados.csv"
 # ARCHIVO_SALICITUDES = "solicitudes_dias.csv"
 
 
-def inicializar_csv():  # Crea los CSVs con encabezados y datos si no existen" - Puede que ni haga falta poner esta funcion
-    pass
+#def inicializar_csv():  # Crea los CSVs con encabezados y datos si no existen" - Puede que ni haga falta poner esta funcion
+#    pass
 
 
 def buscar_empleado(dni):  # Devuelve el dict del empleado o None si no existe"
@@ -75,5 +75,5 @@ def guardar_solicitud(dni, tipo_licencia, fecha_inicio, fecha_fin, descripcion):
             "estado_solicitud":         "pendiente",
         })
 
-def actualizar_campo_solicitud(dni, campo, nuevo_valor):
-    pass  # Modifica un campo de la solicitud más reciente de un empleado. tipo_de_licencia, fecha_inicio, fecha_finalizacion,descripcion_solicitud, estado_solicitud
+#def actualizar_campo_solicitud(dni, campo, nuevo_valor):
+#    pass  # Modifica un campo de la solicitud más reciente de un empleado. tipo_de_licencia, fecha_inicio, fecha_finalizacion,descripcion_solicitud, estado_solicitud
