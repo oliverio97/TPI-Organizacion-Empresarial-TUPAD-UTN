@@ -1,6 +1,5 @@
 from archivos import buscar_empleado, consultar_saldo_dias
-from validaciones import validar_dni
-from solicitudes import generar_solicitud
+from validaciones import validar_dni, validar_fecha
 
 # MAQUINA DE ESTADOS: Diccionario con la "memoria" de la sesión
 estado_usuario = {
@@ -9,9 +8,9 @@ estado_usuario = {
     "nombre_empleado": None,
     "categoria": None,
     "descripcion_solicitud": None,
-    "fecha_inicio": None,
     "dias_disponibles": None,
     "dias_solicitados": None,
+    "fecha_inicio": None,
 }
 
 # =========================================================
@@ -178,12 +177,35 @@ def solicitar_dias():
             )
             estado_usuario["etapa"] = "menu_tramite"
             return True
+        else:
+            estado_usuario["dias_solicitados"] = dias_usuario
+            estado_usuario["etapa"] = "validar_fechas"
+            return True
     except ValueError:
         print(
             "No has ingresado una opcion valida. Ingresa un numero entero para solicitar dias de licencia. \n"
         )
         estado_usuario["etapa"] = "menu_tramite"
         return True
+
+
+def solicitar_fechas():
+    print(
+        "Ingresa la fecha de inicio de tus dias solicitados de licencia.\n Recorda que estos días se tomarán de corrido teniendo en cuenta el dia de inicio y la cantidad de días solicitados."
+        "Para ingresar la fecha, utiliza el formato DD/MM/YYYY (dos digitos para el dia, dos digitos para el mes, cuatro digitos para el año) separados por la barra (/). "
+    )
+    dia_inicio = validar_fecha(input("Tu eleccion: "))
+    if not dia_inicio:
+        print("Has ingresado un formato incorrecto para la fecha. \n")
+        return True
+    elif dia_inicio == False:
+        print(
+            "La fecha ingresada no es correcta. Debes ingresar una fecha como mínimo 15 días hábiles posteriores a la fecha de hoy. \n"
+        )
+        return True
+    else:
+        estado_usuario["fecha_inicio"] = dia_inicio
+        print(f"La fecha es correcta? {dia_inicio}")
 
 
 # =========================================================
@@ -208,6 +230,9 @@ def procesar_estado_actual():
 
         case "solicitar_dias":
             return solicitar_dias()
+
+        case "validar_fechas":
+            return solicitar_fechas()
 
         case "salir":
             return

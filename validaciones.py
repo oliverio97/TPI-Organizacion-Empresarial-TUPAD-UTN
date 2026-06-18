@@ -13,22 +13,27 @@ def validar_dni(dni_texto):
 def validar_fecha(entrada):
     entrada = entrada.strip()
     try:
-        fecha = datetime.strftime(entrada, "%d/%m/%Y")
+        # CORRECCIÓN: strptime convierte el texto (string) en un objeto de fecha
+        fecha = datetime.strptime(entrada, "%d/%m/%Y")
     except ValueError:
+        # Si el usuario ingresa texto o un formato incorrecto (ej: 2026/05/10)
         return None
 
     hoy = datetime.today()
     dias_habiles = 0
     fecha_minima = hoy
+
+    # Cálculo de los 15 días hábiles en el futuro
     while dias_habiles < 15:
         fecha_minima += timedelta(days=1)
-        if fecha_minima.weekday() < 5:
+        if fecha_minima.weekday() < 5:  # 0 a 4 corresponden de Lunes a Viernes
             dias_habiles += 1
 
+    # Verificación contra la fecha ingresada
     if fecha < fecha_minima:
-        return None
+        return False
 
-    return entrada
+    return entrada  # Retorna la fecha original en texto si pasó todas las pruebas
 
 
 def validar_dias(
