@@ -1,1 +1,4 @@
 id_solicitud,DNI_solicitante,tipo_de_licencia,fecha_inicio,fecha_finalizacion,descripcion_solicitud,estado_solicitud
+1,40403499,licencia,25/07/2026,200,estoy harto de trabajar. Me voy a tomar un año sabatico,ingresada
+2,43393906,dias_personales,18/07/2026,15,,ingresada
+3,27252789,licencia,30/10/2026,60,voy a tener un hijo,ingresada

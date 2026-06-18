@@ -1,5 +1,6 @@
 from archivos import buscar_empleado, consultar_saldo_dias, recuperar_sesion
 from validaciones import validar_dni, validar_fecha, entrada_segura
+from solicitudes import generar_solicitud
 
 # MAQUINA DE ESTADOS: Diccionario con la "memoria" de la sesión
 estado_usuario = {
@@ -206,16 +207,21 @@ def solicitar_dias():
     print("¿Cuantos días deseas tomarte?")
     try:
         dias_usuario = int(entrada_segura("Tu eleccion: "))
-        if dias_usuario > estado_usuario["dias_disponibles"]:
-            print(
-                f"No tenes días suficientes. Recordá que tenes {estado_usuario['dias_disponibles']} dias disponibles. "
-            )
-            estado_usuario["etapa"] = "menu_tramite"
-            return True
-        else:
-            estado_usuario["dias_solicitados"] = dias_usuario
-            estado_usuario["etapa"] = "validar_fechas"
-            return True
+        if not estado_usuario["categoria"] == "licencia":
+            if dias_usuario > estado_usuario["dias_disponibles"]:
+                print(
+                    f"No tenes días suficientes. Recordá que tenes {estado_usuario['dias_disponibles']} dias disponibles. "
+                )
+                estado_usuario["etapa"] = "menu_tramite"
+                return True
+            else:
+                estado_usuario["dias_solicitados"] = dias_usuario
+                estado_usuario["etapa"] = "validar_fechas"
+                return True
+        estado_usuario["dias_solicitados"] = dias_usuario
+        estado_usuario["etapa"] = "validar_fechas"
+        return True
+
     except ValueError:
         print(
             "No has ingresado una opcion valida. Ingresa un numero entero para solicitar dias de licencia. \n"
@@ -247,23 +253,42 @@ def solicitar_fechas():
         if chequeo_fecha == "no":
             print()
             return True
-        else:
+        elif chequeo_fecha == "si":
             estado_usuario["etapa"] = "resumen"
+            return True
+        else:
+            print("No ingresaste una opcion valida.")
             return True
 
 
 def mostrar_resumen():
-    print("\n=============== RESUMEN SOLICITUD ===============\n")
     print(
         "Por favor, leé atentamente el resumen de tu solicitud antes de confirmar. \n"
     )
+    print("\n=============== RESUMEN SOLICITUD ===============\n")
     print(f"- DNI solicitante: {estado_usuario['dni']}.")
     print(
-        f"- Nombre y apellido solicitante: {estado_usuario['nombre_empleado']}, {estado_usuario["apellido_empleado"]}"
+        f"- Nombre y apellido solicitante: {estado_usuario['nombre_empleado']} {estado_usuario["apellido_empleado"]}"
     )
     print(f"- Tipo de licencia solicitada: {estado_usuario['categoria']}")
     print(f"- Días solicitados: {estado_usuario['dias_solicitados']}")
     print(f"- Fecha de inicio de la licencia: {estado_usuario['fecha_inicio']}")
+    if estado_usuario["categoria"] == "licencia":
+        print(f"- Justificativo ingresado: {estado_usuario["descripcion_solicitud"]}")
+    print("\n==============================================\n")
+    print()
+    print("¿Los datos son correctos?")
+    chequeo_resumen = entrada_segura(f'Ingresa "si" o "no":')
+    if chequeo_resumen == "no":
+        print("\nOk, proceso cancelado. Volviendo al menú principal.\n")
+        estado_usuario["etapa"] = "inicio"
+        return True
+    elif chequeo_resumen == "si":
+        estado_usuario["etapa"] = "finalizacion"
+        return True
+    else:
+        print("No ingresaste una opcion valida.")
+        return True
 
 
 # =========================================================
@@ -292,11 +317,18 @@ def procesar_estado_actual():
         case "validar_fechas":
             return solicitar_fechas()
 
-        case "salir":
-            return
-
         case "resumen":
             return mostrar_resumen()
+
+        case "finalizacion":
+            generar_solicitud(estado_usuario)
+            print(
+                "Se ha guardado tu solicitud con éxito. En los proximos días se contactarán con vos para informar los proximos pasos."
+            )
+            return
+
+        case "salir":
+            return
 
         case _:
             # Fallback de seguridad por si el estado se rompe

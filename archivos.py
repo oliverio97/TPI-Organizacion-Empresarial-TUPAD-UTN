@@ -66,37 +66,61 @@ def buscar_solicitud(dni):  # Devuelve la solicitud mas reciente de un empleado 
     return encontrada
 
 
-def guardar_solicitud(dni, tipo_licencia, fecha_inicio, fecha_fin, descripcion):
-    with open(
-        "solicitudes_dias.csv", "a", newline="", encoding="utf-8"
-    ) as archivo:  # "a" para modo append, agrega al final del archivo sin borrar lo que hay
-        writer = csv.DictReader(
-            archivo,
-            fieldnames=[
-                "id_solicitud",
-                "DNI_solicitante",
-                "tipo_de_licencia",
-                "fecha_inicio",
-                "fecha_finalizacion",
-                "descripcion_solicitud",
-                "estado_solicitud",
-            ],
-        )
-        writer.writerow(
-            {
-                "id_solicitud": generar_id(),
-                "DNI_solicitante": dni,
-                "tipo_de_licencia": tipo_licencia,
-                "fecha_inicio": fecha_inicio,
-                "fecha_finaliazcion": fecha_fin,
-                "descripcion_solicitud": descripcion,
-                "estado_solicitud": "pendiente",
-            }
-        )
+def guardar_solicitud_csv(diccionario_solicitud):
+    """
+    Recibe el diccionario de la solicitud y lo guarda al final del archivo CSV.
+    Si el archivo no existe, lo crea y le pone los encabezados.
+    """
+    nombre_archivo = "data/solicitudes_dias.csv"
+
+    # Definimos las columnas exactamente como las pediste
+    columnas = [
+        "id_solicitud",
+        "DNI_solicitante",
+        "tipo_de_licencia",
+        "fecha_inicio",
+        "dias_solicitados",
+        "descripcion_solicitud",
+        "estado_solicitud",
+    ]
+
+    # Verificamos si el archivo ya existe antes de abrirlo
+    archivo_existe = os.path.exists(nombre_archivo)
+
+    # Abrimos en modo "a" (append) para agregar al final sin borrar lo anterior
+    with open(nombre_archivo, mode="a", encoding="utf-8", newline="") as archivo:
+        escritor = csv.DictWriter(archivo, fieldnames=columnas)
+
+        # Si el archivo es nuevo, primero le escribimos la fila de encabezados
+        if not archivo_existe:
+            escritor.writeheader()
+
+        # Finalmente, guardamos los datos
+        escritor.writerow(diccionario_solicitud)
 
 
-# def actualizar_campo_solicitud(dni, campo, nuevo_valor):
-#    pass  # Modifica un campo de la solicitud más reciente de un empleado. tipo_de_licencia, fecha_inicio, fecha_finalizacion,descripcion_solicitud, estado_solicitud
+def obtener_proximo_id():
+    """
+    Lee el archivo de solicitudes y devuelve el siguiente número de ID disponible.
+    """
+    nombre_archivo = "data/solicitudes_dias.csv"
+
+    if not os.path.exists(nombre_archivo):
+        return 1  # Si no hay archivo, empezamos por el ID 1
+
+    ultimo_id = 0
+    with open(nombre_archivo, mode="r", encoding="utf-8") as archivo:
+        lector = csv.DictReader(archivo)
+        for fila in lector:
+            try:
+                # Convertimos a entero para comparar
+                id_actual = int(fila["id_solicitud"])
+                if id_actual > ultimo_id:
+                    ultimo_id = id_actual
+            except ValueError:
+                pass  # Ignoramos si hay alguna fila rota o vacía
+
+    return ultimo_id + 1
 
 
 def consultar_saldo_dias(dni):  # Devuelve el dict del empleado o None si no existe"
