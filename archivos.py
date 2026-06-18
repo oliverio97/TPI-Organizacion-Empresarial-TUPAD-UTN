@@ -1,4 +1,5 @@
 import csv
+import os
 
 ARCHIVOS_EMPLEADOS = "data/datos_empleados.csv"
 # ARCHIVO_SALICITUDES = "solicitudes_dias.csv"
@@ -117,3 +118,94 @@ def consultar_saldo_dias(dni):  # Devuelve el dict del empleado o None si no exi
         print("Error: El formato de DNI en el archivo CSV no es válido.")
 
     return None
+
+
+### LOGICA PARA GUARDAR EL ESTADO ACTUAL DE UNA SESION INICIADA ###
+
+# Definimos el nombre del archivo y las columnas exactas de tu diccionario
+ARCHIVO_SESIONES = "data/sesiones_pendientes.csv"
+CAMPOS_SESION = [
+    "etapa",
+    "dni",
+    "nombre_empleado",
+    "categoria",
+    "descripcion_solicitud",
+    "dias_disponibles",
+    "dias_solicitados",
+    "fecha_inicio",
+]
+
+
+def guardar_sesion(estado_usuario):
+    """
+    Guarda el estado actual del usuario en el CSV. Si el DNI ya tiene
+    una sesión guardada, la actualiza. Si no, agrega una nueva fila.
+    """
+    sesiones_existentes = []
+
+    # 1. Leemos las sesiones previas (si el archivo existe)
+    if os.path.exists(ARCHIVO_SESIONES):
+        with open(ARCHIVO_SESIONES, mode="r", encoding="utf-8") as archivo:
+            lector = csv.DictReader(archivo)
+            sesiones_existentes = list(lector)
+
+    # 2. Buscamos si el DNI ya estaba guardado para actualizarlo
+    dni_actual = str(estado_usuario["dni"])
+    actualizado = False
+
+    for i, sesion in enumerate(sesiones_existentes):
+        if sesion["dni"] == dni_actual:
+            sesiones_existentes[i] = estado_usuario  # Pisamos los datos viejos
+            actualizado = True
+            break
+
+    # 3. Si no lo encontró, lo agregamos como una sesión nueva
+    if not actualizado:
+        sesiones_existentes.append(estado_usuario)
+
+    # 4. Sobrescribimos el archivo con la lista actualizada
+    with open(ARCHIVO_SESIONES, mode="w", encoding="utf-8", newline="") as archivo:
+        escritor = csv.DictWriter(archivo, fieldnames=CAMPOS_SESION)
+        escritor.writeheader()
+        escritor.writerows(sesiones_existentes)
+
+
+def recuperar_sesion(dni):
+    """
+    Busca si existe una sesión inconclusa para el DNI ingresado.
+    Retorna el diccionario de estado si lo encuentra, o None si no hay sesión.
+    """
+    if not os.path.exists(ARCHIVO_SESIONES):
+        return None
+
+    with open(ARCHIVO_SESIONES, mode="r", encoding="utf-8") as archivo:
+        lector = csv.DictReader(archivo)
+        for sesion in lector:
+            if sesion["dni"] == str(dni):
+                # Importante: CSV guarda todo como texto. Si tenías valores vacíos,
+                # los transforma en strings vacíos ("").
+                return sesion
+
+    return None
+
+
+def eliminar_sesion(dni):
+    """
+    Borra la sesión del usuario una vez que el trámite finalizó exitosamente.
+    """
+    if not os.path.exists(ARCHIVO_SESIONES):
+        return
+
+    # Leemos todas las filas menos la del DNI que queremos borrar
+    sesiones_restantes = []
+    with open(ARCHIVO_SESIONES, mode="r", encoding="utf-8") as archivo:
+        lector = csv.DictReader(archivo)
+        for sesion in lector:
+            if sesion["dni"] != str(dni):
+                sesiones_restantes.append(sesion)
+
+    # Reescribimos el archivo sin esa fila
+    with open(ARCHIVO_SESIONES, mode="w", encoding="utf-8", newline="") as archivo:
+        escritor = csv.DictWriter(archivo, fieldnames=CAMPOS_SESION)
+        escritor.writeheader()
+        escritor.writerows(sesiones_restantes)

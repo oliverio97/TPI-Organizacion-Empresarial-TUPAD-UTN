@@ -1,4 +1,29 @@
 from datetime import datetime, timedelta
+import sys  # Importación necesaria para poder apagar el programa
+
+# validaciones.py
+import sys
+from archivos import guardar_sesion
+
+
+# IMPORTANTE: Para evitar el error de "importación circular" del que hablamos antes,
+# la importación del estado la hacemos DENTRO de la función, justo antes de usarla.
+def entrada_segura(mensaje_prompt):
+    entrada = input(mensaje_prompt).strip()
+
+    if entrada.lower() in ["salir", "cancelar", "exit"]:
+        # Importamos la memoria en el instante que la necesitamos
+        from maquina_estados import estado_usuario
+
+        # Solo guardamos si el usuario ya se había logueado (tiene DNI)
+        if estado_usuario.get("dni"):
+            guardar_sesion(estado_usuario)
+            print("\nProgreso guardado. Podrás retomarlo cuando vuelvas.")
+
+        print("\nProceso cancelado por el usuario. ¡Hasta luego!")
+        sys.exit()
+
+    return entrada
 
 
 # Valida que el DNI sea numérico y tenga una longitud lógica (7 u 8 dígitos).
@@ -55,8 +80,3 @@ def tipo_descripcion(
     if len(entrada) < 10:
         return None
     return entrada
-
-
-def es_salida(entrada):
-    if entrada.strip().lower() in ["salida", "cancelar", "exit"]:
-        return
