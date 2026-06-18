@@ -3,6 +3,7 @@ from archivos import (
     consultar_saldo_dias,
     recuperar_sesion,
     eliminar_sesion,
+    buscar_solicitud,
 )
 from validaciones import validar_dni, validar_fecha, entrada_segura
 from solicitudes import generar_solicitud
@@ -109,9 +110,30 @@ def manejar_menu_tramite():
             print("\nPerfecto. Accediendo al menú de solicitudes...")
             estado_usuario["etapa"] = "tipo_solicitud"  # Transición
         case "2":
-            print(
-                f"\nConsultando estado para el DNI {estado_usuario['dni']}... (En desarrollo)"
-            )
+            print(f"\nConsultando estado para el DNI {estado_usuario['dni']}...")
+            buscar_solicitud_var = buscar_solicitud(estado_usuario["dni"])
+            if not buscar_solicitud_var:
+                print("No tenes solicitudes pendientes ingresadas.")
+                print("Proceso finalizado. ¡Hasta luego!")
+                return False
+            else:
+                print(
+                    f"Tenes una solicitud de licencia en proceso. El estado de tu solicitud es: {buscar_solicitud_var["estado_solicitud"]}"
+                )
+                print("\n=============== RESUMEN SOLICITUD ===============\n")
+                print(f"- DNI solicitante: {buscar_solicitud_var['DNI_solicitante']}.")
+                print(
+                    f"- Tipo de licencia solicitada: {buscar_solicitud_var['tipo_de_licencia']}"
+                )
+                print(f"- Días solicitados: {buscar_solicitud_var['dias_solicitados']}")
+                print(
+                    f"- Fecha de inicio de la licencia: {buscar_solicitud_var['fecha_inicio']}"
+                )
+                print(
+                    f"- Descripcion / Justificativo ingresado: {buscar_solicitud_var['descripcion_solicitud']}"
+                )
+                print("\n==============================================\n")
+
         case "3" | "salir" | "cancelar":
             print("Proceso finalizado. ¡Hasta luego!")
             return False

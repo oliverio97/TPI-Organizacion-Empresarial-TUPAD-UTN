@@ -2,11 +2,8 @@ import csv
 import os
 
 ARCHIVOS_EMPLEADOS = "data/datos_empleados.csv"
-# ARCHIVO_SALICITUDES = "solicitudes_dias.csv"
-
-
-# def inicializar_csv():  # Crea los CSVs con encabezados y datos si no existen" - Puede que ni haga falta poner esta funcion
-#    pass
+ARCHIVOS_SOLICITUDES = "data/solicitudes_dias.csv"
+ARCHIVO_SESIONES = "data/sesiones_pendientes.csv"
 
 
 def buscar_empleado(dni):  # Devuelve el dict del empleado o None si no existe"
@@ -58,7 +55,7 @@ def generar_id():  # Genera un ID para nuevas solicitudes
 def buscar_solicitud(dni):  # Devuelve la solicitud mas reciente de un empleado o None
     encontrada = None
     with open(
-        "solicitudes_dias.csv", "r", encoding="utf-8"
+        ARCHIVOS_SOLICITUDES, "r", encoding="utf-8"
     ) as archivo:  # El "utf-8" es para que soporte tildes, ñ y caracteres especiales.
         for fila in csv.DictReader(archivo):
             if int(fila["DNI_solicitante"]) == dni:
@@ -147,7 +144,7 @@ def consultar_saldo_dias(dni):  # Devuelve el dict del empleado o None si no exi
 ### LOGICA PARA GUARDAR EL ESTADO ACTUAL DE UNA SESION INICIADA ###
 
 # Definimos el nombre del archivo y las columnas exactas de tu diccionario
-ARCHIVO_SESIONES = "data/sesiones_pendientes.csv"
+
 CAMPOS_SESION = [
     "etapa",
     "dni",
