@@ -1,4 +1,4 @@
-from archivos import buscar_empleado
+from archivos import buscar_empleado, consultar_saldo_dias
 from validaciones import validar_dni
 from solicitudes import generar_solicitud
 
@@ -8,7 +8,9 @@ estado_usuario = {
     "dni": None,
     "nombre_empleado": None,
     "categoria": None,
+    "descripcion_solicitud": None,
     "fecha_inicio": None,
+    "dias_disponibles": None,
     "dias_solicitados": None,
 }
 
@@ -87,7 +89,7 @@ def manejar_menu_principal():
         match opcion:
             case 1:
                 print("Iniciando generación de solicitud...")
-                nuevo_estado = generar_solicitud(estado_usuario["dni"])
+                nuevo_estado = tipo_solicitud(estado_usuario["dni"])
                 estado_usuario["etapa"] = nuevo_estado  ## CHEQUEAR ESTO
                 # estado_usuario["etapa"] = "pidiendo_fechas" # ESTA ES OTRA OPCION
             case 2:
@@ -103,6 +105,63 @@ def manejar_menu_principal():
         print("Error: Ingresa solamente un numero entero.\n")
 
     return True
+
+
+def tipo_solicitud(dni):
+    """Maneja la generacion de licencias"""
+    try:
+        print("\n=============== TIPO DE SOLICITUD ===============")
+        print("1. Vacaciones")
+        print("2. Tomarse días personales")
+        print("3. Licencia por enfermedad / maternidad / otros tipos de licencia. ")
+        print("4. Volver al menú anterior")
+        print("==============================================\n")
+
+        opcion = int(input("Su eleccion: ").strip())
+        match opcion:
+
+            case 1:  # VACACIONES
+                print("Iniciando generación de solicitud...")
+                if consultar_saldo_dias(dni):
+                    print(
+                        f"{estado_usuario["nombre_empleado"]} tenes {consultar_saldo_dias(dni)} dias disponibles"
+                    )
+                    return "solicitar_dias"
+                else:
+                    print(
+                        f" {estado_usuario["nombre_empleado"]}, no tenes dias disponibles. Para mas informacion, contactate con RRHH."
+                    )
+                    return "salir"
+
+            case 2:  # DIAS PERSONALES
+                print("Iniciando generación de solicitud...")
+                if consultar_saldo_dias(dni):
+                    print(
+                        f"{estado_usuario["nombre_empleado"]}, tenes {consultar_saldo_dias(dni)} dias disponibles"
+                    )
+                    return "solicitar_dias"
+                else:
+                    print(
+                        f" {estado_usuario["nombre_empleado"]}, no tenes dias disponibles. Para mas informacion, contactate con RRHH."
+                    )
+                    return "salir"
+
+            case 3:  # LICENCIA POR ENFERMEDAD / OTRO TIPO DE LICENCIA
+                print("Iniciando generación de solicitud...")
+                print(
+                    f"{estado_usuario["nombre_empleado"]}, por favor ingresá la descripcion del justificativo por el cual necesitás tomarte dias de licencia. \nRecordá que, de ser necesario, un miembro de RRHH podra contactarse con vos para solicitarte documentación adicional. \n"
+                )
+                justificativo = input("Descripcion del justificativo: ")
+                estado_usuario["descripcion_solicitud"] = justificativo
+                return "solicitar_dias"
+
+            case 4:
+                return "menu_tramite"  # Transición hacia atrás
+            case _:
+                print("No has ingresado un numero valido entre 1 y 4.\n")
+
+    except ValueError:
+        print("Error: Ingresa solamente un numero entero.\n")
 
 
 # =========================================================
@@ -124,6 +183,9 @@ def procesar_estado_actual():
 
         case "menu_principal":
             return manejar_menu_principal()
+
+        case "salir":
+            return
 
         case _:
             # Fallback de seguridad por si el estado se rompe

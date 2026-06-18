@@ -1,39 +1,48 @@
-from archivos import consultar_saldo_dias
+from validaciones import es_salida
 
 
+## EN ESTE MODULO PONEMOS SOLAMENTE LAS FUNCIONES PARA EMPAQUETAR Y ENVIAR LA SOLICITUD COMPLETA
 # Flujo 1: Generar solicitud
-def generar_solicitud(dni):
-    """Maneja la generacion de licencias"""
+def generar_solicitud():
+    pass
+
+
+def manejar_pidiendo_dias():
+    """Estado: Pide la cantidad de días y valida contra el saldo disponible"""
+    print(f"\nTienes {estado_usuario['dias_disponibles']} días disponibles.")
+    entrada = input("¿Cuántos días te querés tomar? (o escribe 'cancelar'): ").strip()
+
+    if entrada.lower() in ["cancelar", "salir"]:
+        print("Operación cancelada. Volviendo al menú...")
+        estado_usuario["etapa"] = "menu_principal"
+        return True
+
     try:
-        print("\n=============== TIPO DE SOLICITUD ===============")
-        print("1. Vacaciones")
-        print("2. Tomarse días personales")
-        print("3. Licencia por enfermedad / maternidad / otros tipos de licencia. ")
-        print("4. Volver al menú anterior")
-        print("==============================================\n")
+        dias_pedidos = int(entrada)
 
-        opcion = int(input("Su eleccion: ").strip())
+        # VALIDACIONES (Camino Infeliz)
+        if dias_pedidos <= 0:
+            print("Error: Debes ingresar un número mayor a 0.\n")
+            # No cambiamos de etapa, el bucle volverá a ejecutar esta función
 
-        match opcion:
-            case 1:
-                print("Iniciando generación de solicitud...")
-                dias_disponibles = consultar_saldo_dias(dni)
-                if int(dias_disponibles) > 0:
-                    print(f"Tenes {dias_disponibles} dias disponibles.")
-                else:
-                    return None
+        elif dias_pedidos > estado_usuario["dias_disponibles"]:
+            print(
+                f"Error: No puedes pedir {dias_pedidos} días. Solo tienes {estado_usuario['dias_disponibles']} disponibles.\n"
+            )
+            # Se queda en el mismo estado para volver a intentar
 
-            case 2:
-                print("Opción en desarrollo...")
-            case 3:
-                print("Opción en desarrollo...")
-            case 4:
-                estado_usuario["etapa"] = "menu_tramite"  # Transición hacia atrás
-            case _:
-                print("No has ingresado un numero valido entre 1 y 4.\n")
+        else:
+            # CAMINO FELIZ
+            estado_usuario["dias_solicitados"] = dias_pedidos
+            print(f"Perfecto, has solicitado {dias_pedidos} días.")
+
+            # AVANCE DE ESTADO
+            estado_usuario["etapa"] = "pidiendo_fechas"
 
     except ValueError:
-        print("Error: Ingresa solamente un numero entero.\n")
+        print("Error: Por favor, ingresa solo números enteros.\n")
+
+    return True
 
 
 # Flujo 2: Modificar tipo de licencia

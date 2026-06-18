@@ -107,9 +107,10 @@ def consultar_saldo_dias(dni):  # Devuelve el dict del empleado o None si no exi
             for fila in lector:
                 # consultamos los dias que tenga ese empleado
                 if int(fila["dni_empleado"]) == dni:
-                    return fila[
-                        "dias_disponibles"
-                    ]  # Retorna el diccionario con los datos del empleado
+                    if fila["dias_disponibles"]:
+                        return int(fila["dias_disponibles"])  # retorna los dias
+                    else:
+                        return  # Retorna none si dias es 0
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo {ARCHIVOS_EMPLEADOS}.")
     except ValueError:
