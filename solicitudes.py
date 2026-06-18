@@ -1,5 +1,3 @@
-# from validaciones import es_salida
-
 ## EN ESTE MODULO PONEMOS SOLAMENTE LAS FUNCIONES PARA EMPAQUETAR Y ENVIAR LA SOLICITUD COMPLETA
 # Flujo 1: Generar solicitud
 from archivos import guardar_solicitud_csv, obtener_proximo_id
@@ -25,17 +23,3 @@ def generar_solicitud(estado_usuario):
     guardar_solicitud_csv(diccionario_solicitud)
 
     return True
-
-
-def manejar_pidiendo_dias():
-    pass
-
-
-# Flujo 2: Modificar tipo de licencia
-def modificar_tipo_licencia():
-    pass
-
-
-# Flujo 3: Modificar fecha tentativa
-def modificar_fecha_tentativa():
-    pass

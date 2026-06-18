@@ -13,7 +13,6 @@ def buscar_empleado(dni):  # Devuelve el dict del empleado o None si no existe"
             lector = csv.DictReader(archivo)
 
             for fila in lector:
-                # Suponiendo que la columna en tu CSV se llama 'dni' o 'DNI'
                 if int(fila["dni_empleado"]) == dni:
                     return fila  # Retorna el diccionario con los datos del empleado
     except FileNotFoundError:
@@ -27,29 +26,20 @@ def buscar_empleado(dni):  # Devuelve el dict del empleado o None si no existe"
 def actualizar_dias_empleado(
     dni, nuevos_dias
 ):  # Actualiza los dias disponibles de un empleado"
-    with open("datos_empleados.csv", "r", encoding="utf-8") as archivo:
+    with open(ARCHIVOS_EMPLEADOS, "r", encoding="utf-8") as archivo:
         filas = list(csv.DictReader(archivo))
 
     for fila in filas:
-        if int(fila["DNI_empleado"]) == dni:
+        if int(fila["dni_empleado"]) == dni:
             fila["dias_disponibles"] = nuevos_dias
 
-    with open("datos_empleados.csv", "w", newline="", encoding="utf-8") as archivo:
+    with open(ARCHIVOS_EMPLEADOS, "w", newline="", encoding="utf-8") as archivo:
         writer = csv.DictWriter(
             archivo,
-            fieldnames=["DNI_empleado", "nombre", "apellido", "dias_disponibles"],
+            fieldnames=["dni_empleado", "nombre", "apellido", "dias_disponibles"],
         )
         writer.writeheader()
         writer.writerows(filas)
-
-
-def generar_id():  # Genera un ID para nuevas solicitudes
-    with open("solicitudes_dias.csv", "r", encoding="utf-8") as archivo:
-        filas = list(csv.DictReader(archivo))
-        if not filas:
-            return 1
-    ultimo_id = max(int(fila["id_solicitud"]) for fila in filas)
-    return ultimo_id + 1
 
 
 def buscar_solicitud(dni):  # Devuelve la solicitud mas reciente de un empleado o None
@@ -68,7 +58,6 @@ def guardar_solicitud_csv(diccionario_solicitud):
     Recibe el diccionario de la solicitud y lo guarda al final del archivo CSV.
     Si el archivo no existe, lo crea y le pone los encabezados.
     """
-    nombre_archivo = "data/solicitudes_dias.csv"
 
     # Definimos las columnas exactamente como las pediste
     columnas = [
@@ -82,10 +71,10 @@ def guardar_solicitud_csv(diccionario_solicitud):
     ]
 
     # Verificamos si el archivo ya existe antes de abrirlo
-    archivo_existe = os.path.exists(nombre_archivo)
+    archivo_existe = os.path.exists(ARCHIVOS_SOLICITUDES)
 
     # Abrimos en modo "a" (append) para agregar al final sin borrar lo anterior
-    with open(nombre_archivo, mode="a", encoding="utf-8", newline="") as archivo:
+    with open(ARCHIVOS_SOLICITUDES, mode="a", encoding="utf-8", newline="") as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=columnas)
 
         # Si el archivo es nuevo, primero le escribimos la fila de encabezados
@@ -100,13 +89,12 @@ def obtener_proximo_id():
     """
     Lee el archivo de solicitudes y devuelve el siguiente número de ID disponible.
     """
-    nombre_archivo = "data/solicitudes_dias.csv"
 
-    if not os.path.exists(nombre_archivo):
+    if not os.path.exists(ARCHIVOS_SOLICITUDES):
         return 1  # Si no hay archivo, empezamos por el ID 1
 
     ultimo_id = 0
-    with open(nombre_archivo, mode="r", encoding="utf-8") as archivo:
+    with open(ARCHIVOS_SOLICITUDES, mode="r", encoding="utf-8") as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
             try:

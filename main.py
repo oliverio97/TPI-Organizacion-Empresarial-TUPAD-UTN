@@ -14,8 +14,6 @@ def main():
         # Llamamos a la función del módulo maquina_estados.
         # Nos devolverá True para que el while siga, o False si el usuario eligió salir.
         ejecutando = procesar_estado_actual()
-        if not ejecutando:
-            break
 
 
 if __name__ == "__main__":

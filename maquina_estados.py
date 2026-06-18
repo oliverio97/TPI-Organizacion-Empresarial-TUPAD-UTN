@@ -5,7 +5,7 @@ from archivos import (
     eliminar_sesion,
     buscar_solicitud,
 )
-from validaciones import validar_dni, validar_fecha, entrada_segura
+from validaciones import validar_dni, validar_fecha, entrada_segura, tipo_descripcion
 from solicitudes import generar_solicitud
 
 # MAQUINA DE ESTADOS: Diccionario con la "memoria" de la sesión
@@ -62,7 +62,7 @@ def manejar_inicio():
             sesion_guardada = recuperar_sesion(dni_format_valido)
             if sesion_guardada:
                 respuesta = (
-                    input(
+                    entrada_segura(
                         "Tienes un trámite sin terminar. ¿Deseas retomarlo? (si/no): "
                     )
                     .strip()
@@ -180,7 +180,8 @@ def tipo_solicitud(dni):
                         f" {estado_usuario["nombre_empleado"]}, no tenes dias disponibles. Para mas informacion, contactate con RRHH."
                     )
                     print("==============================================\n")
-                    return "salir"
+                    estado_usuario["etapa"] = "menu_tramite"
+                    return True
 
             case 2:  # DIAS PERSONALES
                 print("Iniciando generación de solicitud...")
@@ -204,7 +205,8 @@ def tipo_solicitud(dni):
                         f" {estado_usuario["nombre_empleado"]}, no tenes dias disponibles. Para mas informacion, contactate con RRHH."
                     )
                     print("==============================================\n")
-                    return "salir"
+                    estado_usuario["etapa"] = "menu_tramite"
+                    return True
 
             case 3:  # LICENCIA POR ENFERMEDAD / OTRO TIPO DE LICENCIA
                 print("Iniciando generación de solicitud...")
@@ -213,11 +215,19 @@ def tipo_solicitud(dni):
                     f"{estado_usuario["nombre_empleado"]}, por favor ingresá la descripcion del justificativo por el cual necesitás tomarte dias de licencia. \nRecordá que, de ser necesario, un miembro de RRHH podra contactarse con vos para solicitarte documentación adicional. \n"
                 )
                 print("==============================================\n")
-                justificativo = entrada_segura("Descripcion del justificativo: ")
-                estado_usuario["categoria"] = "licencia"
-                estado_usuario["descripcion_solicitud"] = justificativo
-                estado_usuario["etapa"] = "solicitar_dias"
-                return True
+                justificativo_valido = tipo_descripcion(
+                    entrada_segura("Descripcion del justificativo: ")
+                )
+                if justificativo_valido:
+                    estado_usuario["categoria"] = "licencia"
+                    estado_usuario["descripcion_solicitud"] = justificativo_valido
+                    estado_usuario["etapa"] = "solicitar_dias"
+                    return True
+                else:
+                    print(
+                        "El justificativo es muy corto. Debe tener al menos 10 caracteres.\n"
+                    )
+                    return True  # Vuelve a iterar para pedirlo bien
 
             case 4:
                 estado_usuario["etapa"] = "menu_tramite"  # Transición hacia atrás
@@ -228,6 +238,7 @@ def tipo_solicitud(dni):
 
     except ValueError:
         print("Error: Ingresa solamente un numero entero.\n")
+        return True
 
 
 def solicitar_dias():
@@ -356,7 +367,7 @@ def procesar_estado_actual():
             eliminar_sesion(estado_usuario["dni"])
             # Limpiamos el diccionario de estados para que quede listo para el próximo usuario
             reiniciar_estado_usuario()
-            return True
+            return False
 
         case "salir":
             return
