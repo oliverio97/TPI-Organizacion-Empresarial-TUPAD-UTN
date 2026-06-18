@@ -1,4 +1,9 @@
-from archivos import buscar_empleado, consultar_saldo_dias, recuperar_sesion
+from archivos import (
+    buscar_empleado,
+    consultar_saldo_dias,
+    recuperar_sesion,
+    eliminar_sesion,
+)
 from validaciones import validar_dni, validar_fecha, entrada_segura
 from solicitudes import generar_solicitud
 
@@ -14,6 +19,23 @@ estado_usuario = {
     "dias_solicitados": None,
     "fecha_inicio": None,
 }
+
+
+def reiniciar_estado_usuario():
+    """Limpia el diccionario global para el próximo usuario o trámite."""
+    global estado_usuario
+    estado_usuario = {
+        "etapa": "inicio",
+        "dni": None,
+        "nombre_empleado": None,
+        "apellido_empleado": None,
+        "categoria": None,
+        "descripcion_solicitud": None,
+        "dias_disponibles": None,
+        "dias_solicitados": None,
+        "fecha_inicio": None,
+    }
+
 
 # =========================================================
 # FUNCIONES MANEJADORAS DE ESTADOS
@@ -46,15 +68,20 @@ def manejar_inicio():
                     .lower()
                 )
                 if respuesta in ["si", "s", "sí"]:
-                    # Pisamos el estado actual vacío con los datos que trajimos del CSV
+                    # Pisar el estado actual vacío con los datos que traigo del CSV
                     estado_usuario.update(sesion_guardada)
                     print(f"Retomando desde la etapa: {estado_usuario['etapa']}...")
                     return True  # Sale de la función y el enrutador salta a esa etapa
+                else:
+                    # Si el usuario elige "no", se borra el registro pendiente viejo
+                    eliminar_sesion(dni_format_valido)
+                    print("Descartando sesión pendiente anterior...")
             # -------------------------------------
 
             # Si no tenía sesión o eligió no retomarla, arranca desde cero
             estado_usuario["dni"] = dni_format_valido
             estado_usuario["nombre_empleado"] = empleado.get("nombre", "Empleado")
+            estado_usuario["apellido_empleado"] = empleado.get("apellido", "Empleado")
             estado_usuario["etapa"] = "menu_tramite"
 
             # TRANSICIÓN DE ESTADO
@@ -80,7 +107,7 @@ def manejar_menu_tramite():
     match opcion:
         case "1":
             print("\nPerfecto. Accediendo al menú de solicitudes...")
-            estado_usuario["etapa"] = "menu_principal"  # Transición
+            estado_usuario["etapa"] = "tipo_solicitud"  # Transición
         case "2":
             print(
                 f"\nConsultando estado para el DNI {estado_usuario['dni']}... (En desarrollo)"
@@ -90,39 +117,6 @@ def manejar_menu_tramite():
             return False
         case _:
             print("Opción no válida. Por favor, ingrese 1, 2 o 3.\n")
-
-    return True
-
-
-def manejar_menu_principal():
-    """Maneja el menú principal de licencias"""
-    try:
-        print("\n=============== TIPO DE TRÁMITE ===============")
-        print("1. Generar nueva solicitud")
-        print("2. Modificar tipo de licencia")
-        print("3. Modificar fecha tentativa")
-        print("4. Volver al menú anterior")
-        print("===============================================\n")
-
-        opcion = int(entrada_segura("Su eleccion: ").strip())
-
-        match opcion:
-            case 1:
-                print("Iniciando generación de solicitud...")
-                nuevo_estado = tipo_solicitud(estado_usuario["dni"])
-                estado_usuario["etapa"] = nuevo_estado  ## CHEQUEAR ESTO
-                # estado_usuario["etapa"] = "pidiendo_fechas" # ESTA ES OTRA OPCION
-            case 2:
-                print("Opción en desarrollo...")
-            case 3:
-                print("Opción en desarrollo...")
-            case 4:
-                estado_usuario["etapa"] = "menu_tramite"  # Transición hacia atrás
-            case _:
-                print("No has ingresado un numero valido entre 1 y 4.\n")
-
-    except ValueError:
-        print("Error: Ingresa solamente un numero entero.\n")
 
     return True
 
@@ -153,8 +147,12 @@ def tipo_solicitud(dni):
                         "=============================================================\n"
                     )
                     estado_usuario["categoria"] = "vacaciones"
+                    estado_usuario["descripcion_solicitud"] = (
+                        "001- Solicitud de días de vacaciones"
+                    )
                     estado_usuario["dias_disponibles"] = consultar_saldo_dias(dni)
-                    return "solicitar_dias"
+                    estado_usuario["etapa"] = "solicitar_dias"
+                    return True
                 else:
                     print(
                         f" {estado_usuario["nombre_empleado"]}, no tenes dias disponibles. Para mas informacion, contactate con RRHH."
@@ -173,8 +171,12 @@ def tipo_solicitud(dni):
                     )
                     print("==============================================\n")
                     estado_usuario["categoria"] = "dias_personales"
+                    estado_usuario["descripcion_solicitud"] = (
+                        "002- Solicitud de días personales"
+                    )
                     estado_usuario["dias_disponibles"] = consultar_saldo_dias(dni)
-                    return "solicitar_dias"
+                    estado_usuario["etapa"] = "solicitar_dias"
+                    return True
                 else:
                     print(
                         f" {estado_usuario["nombre_empleado"]}, no tenes dias disponibles. Para mas informacion, contactate con RRHH."
@@ -192,10 +194,13 @@ def tipo_solicitud(dni):
                 justificativo = entrada_segura("Descripcion del justificativo: ")
                 estado_usuario["categoria"] = "licencia"
                 estado_usuario["descripcion_solicitud"] = justificativo
-                return "solicitar_dias"
+                estado_usuario["etapa"] = "solicitar_dias"
+                return True
 
             case 4:
-                return "menu_tramite"  # Transición hacia atrás
+                estado_usuario["etapa"] = "menu_tramite"  # Transición hacia atrás
+                return True
+
             case _:
                 print("No has ingresado un numero valido entre 1 y 4.\n")
 
@@ -308,8 +313,8 @@ def procesar_estado_actual():
         case "menu_tramite":
             return manejar_menu_tramite()
 
-        case "menu_principal":
-            return manejar_menu_principal()
+        case "tipo_solicitud":
+            return tipo_solicitud(estado_usuario["dni"])
 
         case "solicitar_dias":
             return solicitar_dias()
@@ -325,7 +330,11 @@ def procesar_estado_actual():
             print(
                 "Se ha guardado tu solicitud con éxito. En los proximos días se contactarán con vos para informar los proximos pasos."
             )
-            return
+            # Al completarse el trámite con éxito, eliminamos la sesión pendiente
+            eliminar_sesion(estado_usuario["dni"])
+            # Limpiamos el diccionario de estados para que quede listo para el próximo usuario
+            reiniciar_estado_usuario()
+            return True
 
         case "salir":
             return
@@ -333,5 +342,5 @@ def procesar_estado_actual():
         case _:
             # Fallback de seguridad por si el estado se rompe
             print("Error: Estado desconocido. Volviendo al inicio...")
-            estado_usuario["etapa"] = "inicio"
+            reiniciar_estado_usuario()
             return True

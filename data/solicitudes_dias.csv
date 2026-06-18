@@ -1,6 +1,10 @@
 id_solicitud,DNI_solicitante,tipo_de_licencia,fecha_inicio,dias_solicitados,descripcion_solicitud,estado_solicitud
 1,40403499,licencia,25/07/2026,200,estoy harto de trabajar. Me voy a tomar un año sabatico,ingresada
-2,43393906,dias_personales,18/07/2026,15,,ingresada
+2,43393906,dias_personales,18/07/2026,15,ingresada
 3,27252789,licencia,30/10/2026,60,voy a tener un hijo,ingresada
-4,40403499,dias_personales,12/11/2026,2,,ingresada
+4,40403499,dias_personales,12/11/2026,2,ingresada
 5,24258745,licencia,4/12/2026,7,Viaje de negocios,ingresada
+6,40403499,vacaciones,28/09/2026,3,ingresada
+7,40403499,dias_personales,23/10/2026,2,002- Solicitud de días personales,ingresada
+8,40403499,vacaciones,25/10/2027,3,001- Solicitud de días de vacaciones,ingresada
+9,43393906,dias_personales,12/08/2026,20,002- Solicitud de días personales,ingresada

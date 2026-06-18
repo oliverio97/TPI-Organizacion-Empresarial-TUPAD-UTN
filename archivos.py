@@ -152,6 +152,7 @@ CAMPOS_SESION = [
     "etapa",
     "dni",
     "nombre_empleado",
+    "apellido_empleado",
     "categoria",
     "descripcion_solicitud",
     "dias_disponibles",

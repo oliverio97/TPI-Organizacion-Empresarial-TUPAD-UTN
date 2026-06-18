@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
-import sys  # Importación necesaria para poder apagar el programa
-
-# validaciones.py
-import sys
 from archivos import guardar_sesion
+import sys  # Importación necesaria para poder apagar el programa
 
 
 # IMPORTANTE: Para evitar el error de "importación circular" del que hablamos antes,
