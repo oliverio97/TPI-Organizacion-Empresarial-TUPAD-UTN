@@ -232,10 +232,10 @@ def solicitar_fechas():
     )
     print("===================================================\n")
     dia_inicio = validar_fecha(entrada_segura("Tu eleccion: "))
-    if not dia_inicio:
+    if dia_inicio is None:
         print("Has ingresado un formato incorrecto para la fecha. \n")
         return True
-    elif dia_inicio == False:
+    elif dia_inicio is False:
         print(
             "La fecha ingresada no es correcta. Debes ingresar una fecha como mínimo 15 días hábiles posteriores a la fecha de hoy. \n"
         )

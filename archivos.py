@@ -30,7 +30,7 @@ def buscar_empleado(dni):  # Devuelve el dict del empleado o None si no existe"
 def actualizar_dias_empleado(
     dni, nuevos_dias
 ):  # Actualiza los dias disponibles de un empleado"
-    with open("datos_emplados.csv", "r", encoding="utf-8") as archivo:
+    with open("datos_empleados.csv", "r", encoding="utf-8") as archivo:
         filas = list(csv.DictReader(archivo))
 
     for fila in filas:
@@ -47,7 +47,7 @@ def actualizar_dias_empleado(
 
 
 def generar_id():  # Genera un ID para nuevas solicitudes
-    with open("solicitudes_dias,csv", "r", encoding="utf-8") as archivo:
+    with open("solicitudes_dias.csv", "r", encoding="utf-8") as archivo:
         filas = list(csv.DictReader(archivo))
         if not filas:
             return 1
@@ -70,7 +70,7 @@ def guardar_solicitud(dni, tipo_licencia, fecha_inicio, fecha_fin, descripcion):
     with open(
         "solicitudes_dias.csv", "a", newline="", encoding="utf-8"
     ) as archivo:  # "a" para modo append, agrega al final del archivo sin borrar lo que hay
-        writer = csv.DictReader(
+        writer = csv.DictWriter(
             archivo,
             fieldnames=[
                 "id_solicitud",
