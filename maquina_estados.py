@@ -126,6 +126,8 @@ def tipo_solicitud(dni):
                     print(
                         f"{estado_usuario["nombre_empleado"]} tenes {consultar_saldo_dias(dni)} dias disponibles"
                     )
+                    estado_usuario["categoria"] = "vacaciones"
+                    estado_usuario["dias_disponibles"] = consultar_saldo_dias(dni)
                     return "solicitar_dias"
                 else:
                     print(
@@ -139,6 +141,8 @@ def tipo_solicitud(dni):
                     print(
                         f"{estado_usuario["nombre_empleado"]}, tenes {consultar_saldo_dias(dni)} dias disponibles"
                     )
+                    estado_usuario["categoria"] = "dias_personales"
+                    estado_usuario["dias_disponibles"] = consultar_saldo_dias(dni)
                     return "solicitar_dias"
                 else:
                     print(
@@ -164,6 +168,24 @@ def tipo_solicitud(dni):
         print("Error: Ingresa solamente un numero entero.\n")
 
 
+def solicitar_dias():
+    print("¿Cuantos días deseas tomarte?")
+    try:
+        dias_usuario = int(input("Tu eleccion: "))
+        if dias_usuario > estado_usuario["dias_disponibles"]:
+            print(
+                f"No tenes días suficientes. Recordá que tenes {estado_usuario['dias_disponibles']} dias disponibles. "
+            )
+            estado_usuario["etapa"] = "menu_tramite"
+            return True
+    except ValueError:
+        print(
+            "No has ingresado una opcion valida. Ingresa un numero entero para solicitar dias de licencia. \n"
+        )
+        estado_usuario["etapa"] = "menu_tramite"
+        return True
+
+
 # =========================================================
 # ENRUTADOR PRINCIPAL
 # =========================================================
@@ -183,6 +205,9 @@ def procesar_estado_actual():
 
         case "menu_principal":
             return manejar_menu_principal()
+
+        case "solicitar_dias":
+            return solicitar_dias()
 
         case "salir":
             return
